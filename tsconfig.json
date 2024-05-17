@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "Node16",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2022",
+    "jsx": "react-jsx",
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "stripInternal": true,
+    "alwaysStrict": true,
+    "moduleResolution": "Node16",
+    "noEmit": true,
+    "baseUrl": "."
+  },
+  "include": ["./src/**/*", "./scripts/**/*", ".eslintrc.js"]
+}

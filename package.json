@@ -1,0 +1,59 @@
+{
+  "name": "docxer",
+  "version": "0.0.1",
+  "description": "docx template engine",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "esnext": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "docxer": "./bin/index.js"
+  },
+  "scripts": {
+    "d": "node --enable-source-maps dist/index.cjs",
+    "bundle": "tsc --project tsconfig.d.json && ts-node --project tsconfig.json scripts/esbuild.ts",
+    "build": "rm -rf dist && NODE_ENV=production pnpm bundle",
+    "watch": "WATCH=true pnpm bundle",
+    "lint": "tsc --noEmit && eslint \"./{src,scripts}/**/*.ts\" --fix",
+    "lint-staged": "lint-staged",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,ts}": "eslint --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/binfo/docxer.git"
+  },
+  "keywords": [
+    "docx",
+    "template"
+  ],
+  "author": "YuhangGe <abeyuhang@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/binfoe/docxer/issues"
+  },
+  "homepage": "https://github.com/binfoe/docxer#readme",
+  "devDependencies": {
+    "@types/debug": "^4.1.12",
+    "@types/node": "^20.12.12",
+    "@typescript-eslint/eslint-plugin": "^7.9.0",
+    "@typescript-eslint/parser": "^7.9.0",
+    "esbuild": "^0.21.3",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-define-config": "^2.1.0",
+    "eslint-plugin-import": "npm:eslint-plugin-i@^2.29.1",
+    "eslint-plugin-prettier": "^5.1.3",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^4.3.6",
+    "jszip": "^3.10.1"
+  }
+}
