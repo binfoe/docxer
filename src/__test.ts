@@ -1,37 +1,20 @@
 import { readFileSync, writeFileSync } from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { processDocx } from './process';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function test() {
   void processDocx({
-    docxFileBuf: readFileSync(path.resolve(__dirname, '../sample/sample.docx')),
+    docxFileBuf: readFileSync(path.resolve(__dirname, '../sample/bb.docx')),
     renderData: {
-      sample: {
-        name: 'test',
-        code: 'ccccc',
-        age: 18,
+      基础信息: {
+        估价报告编号: '久源房估（2024）字第888号',
       },
-      exams: [
-        {
-          name: 'aaa',
-          age: 1,
-        },
-        {
-          name: 'bbb',
-          age: 2,
-        },
-      ],
-      // name: '郭芙蓉',
-      // gender: 1,
-      // age: 18,
-      // date: '2024-04-12',
-      // ocs: 0.103,
-      // result: { ca125: 34.56, he4: 3.45, c5a: 1.11 },
-      // records: new Array(5).fill(0).map((n, i) => ({
-      //   a: `a-${i}`,
-      //   b: `b-${i}`,
-      // })),
-      // someimg: readFileSync(path.resolve(__dirname, '../sample/xx.webp')),
+      产权人信息: {
+        姓名: '小葛',
+      },
     },
   }).then((res) => {
     writeFileSync(path.resolve(__dirname, '../sample/out.docx'), res as Buffer);

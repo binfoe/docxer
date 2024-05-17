@@ -74,7 +74,9 @@ function walkP(paragraph: Paragraph, ctx: WalkPCtx, currentNode: DocxNode, paren
   } else if (tag === 'w:commentRangeEnd') {
     ctx.cmtNodes.push(currentNode);
     const di = ctx.diStack.pop();
-    if (!di) throw new Error('批注不能跨段落');
+    if (!di) {
+      throw new Error('ERROR_CROSS_PARAGRAPH: 批注不能跨段落');
+    }
     if (di.type === 'range') {
       di.toCol = ctx.tidx + 1;
       if (di.fromCol === di.toCol) throw new Error('批注不能标记在空位置');

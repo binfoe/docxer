@@ -1,20 +1,16 @@
+import { globalConfig } from 'src/config';
 import { getXmlTag } from 'src/node';
 import type { DocxStores } from 'src/store';
 import { extractXmlNodesText } from 'src/util';
 
-export interface RenderConfig {
-  // 渲染结束后，额外删除文档尾部的段落。默认为 0。该参数可用于修正渲染后可能多出来的空段落（空页）。
-  dropTailParagraphs?: number;
-}
 export interface Config {
   prepare?: string;
-  renderConfig: RenderConfig;
 }
 
 export function doConfigPrepare(renderData: Record<string, unknown>, cfg: Config) {
   if (!cfg.prepare) return;
   const fn = new Function('$data', '$config', cfg.prepare);
-  fn(renderData, cfg.renderConfig);
+  fn(renderData, globalConfig);
 }
 
 export function parseConfig(globalStores: DocxStores, pnodes: Record<string, unknown>[]) {

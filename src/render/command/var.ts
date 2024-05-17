@@ -1,6 +1,7 @@
 import type { DocxNode } from 'src/node';
 import { $ } from 'src/node';
 import type { ImageDrawing } from 'src/parse/common';
+import { globalConfig } from 'src/config';
 import type { RenderContext } from '../context';
 import type { RenderCmdOpts } from './common';
 import { getMaxCommonPath, getNodeByPath } from './common';
@@ -16,7 +17,7 @@ export function walkReplace(node: DocxNode, val: string) {
       if (!tn) return;
       if (first) {
         first = false;
-        tn['#text'] = (val ?? '').toString();
+        tn['#text'] = (val ?? globalConfig.emptyVarText).toString();
       } else {
         tn['#text'] = '';
       }
@@ -56,7 +57,7 @@ export function walkPathReplace(
         if (!tn) return;
         if (first) {
           first = false;
-          tn['#text'] = (val ?? '').toString();
+          tn['#text'] = (val ?? globalConfig.emptyVarText).toString();
         } else {
           tn['#text'] = '';
         }
@@ -69,7 +70,7 @@ export function walkPathReplace(
         if (!tn) return;
         if (first) {
           first = false;
-          tn['#text'] = (val ?? '').toString();
+          tn['#text'] = (val ?? globalConfig.emptyVarText).toString();
         } else {
           tn['#text'] = '';
         }

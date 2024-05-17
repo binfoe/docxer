@@ -35,6 +35,7 @@ export function renderDocument({
 }) {
   const dataKeys = Object.keys(renderData);
   if (dataKeys.includes('$helper')) throw new Error('renderData 参数的属性不能有保留单词 $helper');
+
   const context = new RenderContext(
     dataKeys,
     dataKeys.map((p) => renderData[p]),

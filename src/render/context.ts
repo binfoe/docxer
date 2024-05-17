@@ -1,5 +1,5 @@
 import type JSZip from 'jszip';
-import { renderHelper } from './helper';
+import { globalConfig } from 'src/config';
 
 export class RenderContext {
   #keys: string[];
@@ -28,6 +28,19 @@ export class RenderContext {
   }
   eval(expr: string) {
     const fn = new Function('$helper', ...this.#keys, `return ${expr}`);
-    return fn(renderHelper, ...this.#vals);
+    try {
+      return fn(globalConfig.helperFunctions, ...this.#vals);
+    } catch (ex) {
+      if (ex.name === 'ReferenceError') {
+        const vn = ex.message.slice(0, ex.message.length - 15);
+        if (expr.startsWith(vn)) {
+          throw new Error('ERROR_MISSING_FORM:' + expr);
+        } else {
+          throw new Error('ERROR_MISSING_FORM_FIELD:' + expr);
+        }
+      } else {
+        throw ex;
+      }
+    }
   }
 }

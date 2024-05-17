@@ -7,9 +7,11 @@ import type { DocxStores } from './store';
 import { prepareDirectives } from './directive';
 import { renderDocument } from './render';
 import type { Paragraph } from './parse/common';
-import { doConfigPrepare, type RenderConfig } from './parse/config';
+import { doConfigPrepare } from './parse/config';
 import type { DocxNode } from './node';
 import { $ } from './node';
+import type { RenderConfig } from './config';
+import { globalConfig } from './config';
 
 // 校验和预处理 directives，当前仅处理两层。文本框内如果再嵌入文本框不支持。
 function prepareParagraph(par: Paragraph) {
@@ -31,16 +33,15 @@ export async function processDocx({
   docxFileBuf: ArrayBuffer | Buffer;
   /** 渲染数据。必须是 object 对象，且不能有 'ctx' 这个保留单词的属性名。 */
   renderData: { [key: string]: unknown };
-  renderConfig?: RenderConfig;
+  renderConfig?: Partial<RenderConfig>;
 }) {
   if (typeof renderData !== 'object' || renderData === null) {
     throw new Error('bad renderData');
   }
 
-  renderConfig = {
-    dropTailParagraphs: 0,
-    ...renderConfig,
-  };
+  const { helperFunctions, ...configs } = renderConfig ?? {};
+  Object.assign(globalConfig, configs);
+  Object.assign(globalConfig.helperFunctions, helperFunctions);
 
   const zip = await JSZip.loadAsync(docxFileBuf);
   const mainDocFilename = 'word/document.xml';
@@ -55,9 +56,7 @@ export async function processDocx({
   const globalStores: DocxStores = {
     cmtStore,
     relsStore,
-    cfg: {
-      renderConfig,
-    },
+    cfg: {},
   };
 
   const mainDoc = await readXML(zip, mainDocFilename);
@@ -86,10 +85,10 @@ export async function processDocx({
    * 渲染完成后，额外删除尾部的 w:p。用于微调渲染结果。
    * dropTailParagraphs 参数可在 #docxer-config 的 #prepare 中配置。
    */
-  if (renderConfig.dropTailParagraphs > 0) {
+  if (globalConfig.dropTailParagraphs > 0) {
     const arr = mainBody[$].children;
     let i = 0;
-    while (i < renderConfig.dropTailParagraphs) {
+    while (i < globalConfig.dropTailParagraphs) {
       let j = arr.length - 1;
       for (; j >= 0; j--) {
         if (arr[j][$].tag === 'w:p') {
