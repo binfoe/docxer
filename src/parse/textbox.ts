@@ -113,7 +113,11 @@ export function wrapP(currentNode: DocxNode, parentNode: DocxNode) {
  * #var age
  * ```
  */
-export function parseTextbox(globalStores: DocxStores, node: DocxNode, texts: string[]): Paragraph[] {
+export function parseTextbox(
+  globalStores: DocxStores,
+  node: DocxNode,
+  texts: string[],
+): Paragraph[] {
   const txc = findByTagPath(node, ['wps:txbx', 'w:txbxContent']);
   if (!txc) {
     logger.error('没有找到 w:txbxContent');

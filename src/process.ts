@@ -106,6 +106,8 @@ export async function processDocx({
 
   writeXML(zip, mainDocFilename, mainDoc);
   commentsDoc && writeXML(zip, commentsDocFilename, commentsDoc);
-  const buf = await zip.generateAsync({ type: typeof Buffer === 'undefined' ? 'blob' : 'nodebuffer' });
+  const buf = await zip.generateAsync({
+    type: typeof Buffer === 'undefined' ? 'blob' : 'nodebuffer',
+  });
   return buf;
 }

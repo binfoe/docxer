@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "Node16",
+    "module": "ESNext",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "target": "ES2022",
@@ -9,9 +9,9 @@
     "noImplicitReturns": true,
     "stripInternal": true,
     "alwaysStrict": true,
-    "moduleResolution": "Node16",
+    "moduleResolution": "Bundler",
     "noEmit": true,
     "baseUrl": "."
   },
-  "include": ["./src/**/*", "./scripts/**/*", ".eslintrc.js"]
+  "include": ["./src/**/*"]
 }

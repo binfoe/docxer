@@ -36,7 +36,15 @@ class ArgLexer {
     return word;
   }
 }
-export function renderTableCommand({ argstr, context, tbl }: { argstr: string; context: RenderContext; tbl: Table }) {
+export function renderTableCommand({
+  argstr,
+  context,
+  tbl,
+}: {
+  argstr: string;
+  context: RenderContext;
+  tbl: Table;
+}) {
   const lexer = new ArgLexer(argstr.trim());
   const range = lexer.next();
   if (!range || !/^\d+(-\d+)?$/.test(range)) {

@@ -1,3 +1,4 @@
+/* global module */
 /**
  * @type {import('eslint-define-config').ESLintConfig}
  */
@@ -13,7 +14,7 @@ module.exports = {
   ],
   parserOptions: {
     sourceType: 'module',
-    project: ['./tsconfig.json'],
+    project: ['./tsconfig.json', './tsconfig.node.json'],
   },
   rules: {
     'import/order': 'error',

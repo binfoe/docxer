@@ -122,7 +122,8 @@ export function prepareDirectives(paragraph: Paragraph) {
   }
 
   const ri = directives.findIndex((d) => d.type === 'range');
-  if (ri > 1 || (ri < 0 && directives.length > 1)) throw new Error('段落级标记只能标记一次，请将指令合并到同一标记中');
+  if (ri > 1 || (ri < 0 && directives.length > 1))
+    throw new Error('段落级标记只能标记一次，请将指令合并到同一标记中');
   if (ri < 0) {
     // 全部是段落级标记，没有 range 标记
     return;

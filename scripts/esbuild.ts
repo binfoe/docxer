@@ -1,8 +1,11 @@
 import path from 'path';
+import { fileURLToPath } from 'url';
 import type { BuildOptions } from 'esbuild';
 import esbuild from 'esbuild';
 
-function getOption(type: 'cjs' | 'esm'): BuildOptions {
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+function getOption(): BuildOptions {
   return {
     entryPoints: [path.resolve(__dirname, '../src/index.ts')],
     sourcemap: true,
@@ -10,33 +13,27 @@ function getOption(type: 'cjs' | 'esm'): BuildOptions {
     packages: 'external',
     charset: 'utf8',
     bundle: true,
-    ...(type === 'cjs'
-      ? {
-          platform: 'node',
-        }
-      : {
-          format: 'esm',
-          target: 'esnext',
-        }),
+    format: 'esm',
+    platform: 'node',
     // outdir: 'dist',
-    outfile: `dist/index.${type === 'cjs' ? 'cjs' : 'mjs'}`,
+    outfile: `dist/index.js`,
   };
 }
 
-async function bundle(type: 'cjs' | 'esm') {
-  const result = await esbuild.build(getOption(type));
+async function bundle() {
+  const result = await esbuild.build(getOption());
   // console.log(result);
   if (result.errors?.length) {
     console.error(result.errors);
   } else {
-    console.log(`==> dist/index.${type} bundled.`);
+    console.log(`==> dist/index.js bundled.`);
   }
 }
 (async () => {
-  await Promise.all([bundle('cjs'), bundle('esm')]);
+  await Promise.all([bundle()]);
 
   if (process.env.WATCH) {
-    const ctx = await esbuild.context(getOption('cjs'));
+    const ctx = await esbuild.context(getOption());
     await ctx.watch();
     console.log('Watching For dist/index.mjs bundle...');
   }

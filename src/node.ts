@@ -46,7 +46,11 @@ export function rmNode(node: DocxNode) {
 export function getXmlTag(node: Record<string, unknown>) {
   return Object.keys(node).find((k) => k !== ':@');
 }
-export function loopStartToEndNodes(startNode: DocxNode, endNode: DocxNode, cb: (n: DocxNode) => void) {
+export function loopStartToEndNodes(
+  startNode: DocxNode,
+  endNode: DocxNode,
+  cb: (n: DocxNode) => void,
+) {
   /**
    * 在 callback 函数中，可能会将节点从 parent.children 数组中移除，会影响 parent.children。
    * 因此将 children 先浅拷贝一份后在拷贝数据上迭代。

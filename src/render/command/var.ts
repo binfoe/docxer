@@ -29,7 +29,12 @@ export function walkReplace(node: DocxNode, val: string) {
   walknode(node);
 }
 
-export function walkPathReplace(pnode: DocxNode, val: unknown, fromPath: number[], toPath: number[]) {
+export function walkPathReplace(
+  pnode: DocxNode,
+  val: unknown,
+  fromPath: number[],
+  toPath: number[],
+) {
   const mcp = getMaxCommonPath(fromPath, toPath);
   const root = getNodeByPath(pnode, mcp);
   const left = getNodeByPath(pnode, fromPath);
