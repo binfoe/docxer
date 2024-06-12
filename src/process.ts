@@ -1,5 +1,5 @@
 import JSZip from 'jszip';
-import { readXML, writeXML } from './util';
+import { isObj, readXML, writeXML } from './util';
 import { parseComments } from './store/comment';
 import { parseXmlBody } from './parse';
 import { parseRels } from './store/relation';
@@ -35,8 +35,8 @@ export async function processDocx({
   renderData: { [key: string]: unknown };
   renderConfig?: Partial<RenderConfig>;
 }) {
-  if (typeof renderData !== 'object' || renderData === null) {
-    throw new Error('bad renderData');
+  if (!isObj(renderData)) {
+    throw new Error('renderData 参数必须传递包含渲染数据的对象');
   }
 
   const { helperFunctions, ...configs } = renderConfig ?? {};

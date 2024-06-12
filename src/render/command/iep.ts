@@ -1,11 +1,11 @@
 import { $, cloneNode } from 'src/node';
-import { generateDocxRndId } from 'src/util';
+import { generateDocxRndId, isNum } from 'src/util';
 import type { RenderCmdOpts } from './common';
 import { walkReplace } from './var';
 
 export function renderIepCommand({ argstr, paragraph, context }: RenderCmdOpts) {
   const count = context.eval(argstr);
-  if (typeof count !== 'number' || count < 1) {
+  if (!isNum(count) || count < 1) {
     throw new Error('#iep 指令的表达式必须返回正整数');
   }
 

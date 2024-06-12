@@ -67,7 +67,15 @@ export function processDocx(options: {
 
 ## 表格批注指令
 
-- `#table [start](-[end]) [each] [datasource]` 标记当前表格使用动态数据渲染，会执行 `datasource` 参数的表达式并返回一个Array，渲染引擎会遍历 Array 循环生成表格数据行。`each` 参数是一个变量名称，在表格行里使用正文批注指令时，可通过该名称访问每次循环的数据。`start` 和 `end` 是要循环渲染的模板行。在模板行中，可以使用任意`正文批注指令`。`end` 可不指定，默认为 `start`。`end` 之后的所有行会被删除。
+#### `#table [start](-[end]) [each] [datasource]`
+
+标记当前表格使用动态数据渲染，会执行 `datasource` 参数的表达式并返回一个Array，渲染引擎会遍历 Array 循环生成表格数据行。`each` 参数是一个变量名称，在表格行里使用正文批注指令时，可通过该名称访问每次循环的数据。`start` 和 `end` 是要循环渲染的模板行，从`1` 开始计数，如果要跳过表头，则一般指定为 `2`。在模板行中，可以使用任意`正文批注指令`。`end` 可不指定，默认为 `start`。`end` 之后的所有行会被删除。
+
+#### `#dymtable [columns] [datasource]`
+
+标记当前表格完全使用动态渲染。`columns` 参数是一个表达式，返回列的定义数据。`datasource` 是表格数据行。渲染时会将表格的第一行使用 `columns` 数据填充（多余的列会被删除，缺少的列会拿第一列克隆），然后将表格的第二行克隆后使用 `datasource` 填充。受当前代码逻辑所限，`columns` 表达式不能有空格，但 `datasource` 表达式中可以含空格。
+
+`columns` 表达式需要返回结构 `{ width?: number; name: string; key: string }`，其中 name 是表头文字，key 是从 `datasource` 中取数据的属性名，width 是宽度（像素 px 单位，会乘以 20 换算成 dxa 单位写入 docx 文件）。width 为可选字段，不指定则不修改模板中的宽度。
 
 ## 图片描述指令
 

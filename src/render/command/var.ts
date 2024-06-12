@@ -2,11 +2,12 @@ import type { DocxNode } from 'src/node';
 import { $ } from 'src/node';
 import type { ImageDrawing } from 'src/parse/common';
 import { globalConfig } from 'src/config';
+import { isStr } from 'src/util';
 import type { RenderContext } from '../context';
 import type { RenderCmdOpts } from './common';
 import { getMaxCommonPath, getNodeByPath } from './common';
 
-export function walkReplace(node: DocxNode, val: string) {
+export function walkReplace(node: DocxNode, val?: string) {
   let first = true;
   function walknode(n: DocxNode) {
     const { tag, children } = n[$];
@@ -101,13 +102,13 @@ export function renderPictureVarCommand(argstr: string, context: RenderContext, 
     throw new Error('图片标注中的 #var 指令必须返回 base64 字符串或 binary 内容');
   };
   if (typeof Buffer !== 'undefined') {
-    if (typeof val === 'string') {
+    if (isStr(val)) {
       val = Buffer.from(val, 'base64');
     } else if (!(val instanceof Buffer)) {
       err();
     }
   } else {
-    if (typeof val === 'string') {
+    if (isStr(val)) {
       val = Uint8Array.from(atob(val), (c) => c.charCodeAt(0));
     } else if (!(val instanceof ArrayBuffer)) {
       err();

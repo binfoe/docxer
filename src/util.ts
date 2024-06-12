@@ -104,3 +104,18 @@ export function generateDocxRndId(len = 8) {
   }
   return id.join('');
 }
+
+export function isUndefined(v: unknown): v is undefined {
+  return typeof v === 'undefined';
+}
+
+export function isStr(v: unknown): v is string {
+  return typeof v === 'string';
+}
+export function isObj<T extends object>(v: unknown): v is T {
+  return typeof v === 'object' && v !== null;
+}
+
+export function isNum(v: unknown): v is number {
+  return typeof v === 'number';
+}

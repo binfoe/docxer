@@ -47,10 +47,10 @@ function walkP(paragraph: Paragraph, ctx: WalkPCtx, currentNode: DocxNode, paren
       const cmd = i > 0 ? txt.slice(0, i) : txt;
       const argstr = i > 0 ? txt.slice(i + 1) : '';
       if (ti === 0) {
-        istbl = cmd === '#table';
+        istbl = cmd === '#table' || cmd === '#dymtable';
         isp = PCmdSet.has(cmd);
       } else if (istbl) {
-        throw new Error('#table 指令不能和其它指混用');
+        throw new Error('#table 或 #dymtable 指令不能和其它指混用');
       } else if (isp !== PCmdSet.has(cmd)) {
         throw new Error('段落级指令和局部指令不能混用');
       }
@@ -83,7 +83,7 @@ function walkP(paragraph: Paragraph, ctx: WalkPCtx, currentNode: DocxNode, paren
     }
     if (di.type === 'table') {
       if (ctx.tableDirective) {
-        throw new Error('#table 指令只能标记一次');
+        throw new Error('#table 或 #dymtable 指令只能标记一次');
       }
       ctx.tableDirective = di;
     } else {
@@ -152,7 +152,7 @@ export function parseParagraph(
   };
   walkP(paragraph, ctx, pnode, parent);
   if (ctx.tableDirective) {
-    throw new Error('#table 指令只能在表格中标记');
+    throw new Error('#table 或 #dymtable 指令只能在表格中标记');
   }
   if (ctx.meetConfig) {
     return [true];

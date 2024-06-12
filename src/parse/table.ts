@@ -5,7 +5,7 @@ import type { TableDirective } from 'src/directive';
 import type { Paragraph } from './common';
 import { parseTableParagraph } from './paragraph';
 
-interface TRow {
+export interface TRow {
   node: DocxNode;
   paragraphs: Paragraph[];
 }
@@ -23,7 +23,7 @@ export function parseTable(globalStores: DocxStores, node: DocxNode): Table {
     if (tag === 'w:p') {
       const { paragraph, tableDirective } = parseTableParagraph(globalStores, n, parent);
       if (tableDirective) {
-        if (loopDirective) throw new Error('#table 指令只能标记一次');
+        if (loopDirective) throw new Error('#table 或 #dymtable 指令只能标记一次');
         loopDirective = tableDirective;
       }
       const tr = trows[trows.length - 1];

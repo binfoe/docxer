@@ -1,7 +1,9 @@
-import type { Table } from 'src/parse/table';
-import { $, cloneNode, rmNode } from 'src/node';
+import type { TRow, Table } from 'src/parse/table';
+import { $, cloneNode, findByTagPath, rmNode } from 'src/node';
+import { isNum, isObj, isStr } from 'src/util';
 import type { RenderContext } from '../context';
 import { renderParagraph } from '../paragraph';
+import { walkReplace } from './var';
 
 class ArgLexer {
   #s: string;
@@ -87,5 +89,85 @@ export function renderTableCommand({
     tbl.node[$].children.push(cloneTr);
 
     context.pop();
+  }
+}
+
+export function renderDymTableCommand({
+  argstr,
+  context,
+  tbl,
+}: {
+  argstr: string;
+  context: RenderContext;
+  tbl: Table;
+}) {
+  const lexer = new ArgLexer(argstr.trim());
+  const columnsExpr = lexer.next();
+  if (!columnsExpr) {
+    throw new Error('#dymtable 指令需要指定 columns 表达式');
+  }
+  type Col = { width: number; name: string; key: string };
+  const columns = context.eval(columnsExpr) as Col[];
+  if (!Array.isArray(columns)) {
+    throw new Error('#dymtable 指令的 columns 表达式必须返回数组');
+  }
+  columns.forEach((column) => {
+    if (!isObj<Col>(column) || !isStr(column.key) || !isStr(column.name)) {
+      throw new Error(
+        '#dymtable 指定的 columns 必须是 {width?: number; key: string; name: string} 的结构数据',
+      );
+    }
+    column.width = isNum(column.width) ? column.width : 0;
+  });
+  const datasource = argstr.slice(lexer.i);
+  if (!datasource) {
+    throw new Error('#dymtable 指令需要指定循环数据源 datasource 的表达式');
+  }
+  const vals = context.eval(datasource);
+  if (!Array.isArray(vals)) {
+    throw new Error('#dymtable 指令的 datasource 表达式必须返回数组');
+  }
+  const th = tbl.rows[0];
+  const tr = tbl.rows[1];
+  if (!th || !tr) {
+    throw new Error('#dymtable 指令的标记的表格至少要有两行，第一行是表头，第二行是表身');
+  }
+
+  for (let i = 0; i < tbl.rows.length; i++) {
+    rmNode(tbl.rows[i].node);
+  }
+
+  const renderCols = (row: TRow['node'], isHead: boolean, cellVal?: Record<string, string>) => {
+    const colArr = row[$].children.slice();
+    row[$].children.length = 0;
+    for (let i = 0; i < columns.length; i++) {
+      const column = columns[i];
+
+      let tc = colArr[i];
+      if (!tc) {
+        tc = cloneNode(colArr[0], row);
+      }
+      if (column.width > 0) {
+        const wtc = findByTagPath(tc, ['w:tcPr', 'w:tcW']);
+        if (wtc) {
+          wtc[':@']['w:type'] = 'dxa';
+          wtc[':@']['w:w'] = `${column.width * 20}`;
+        }
+      }
+      if (isHead) {
+        walkReplace(tc, column.name);
+      } else {
+        walkReplace(tc, cellVal?.[column.key]);
+      }
+      row[$].children.push(tc);
+    }
+  };
+  renderCols(th.node, true);
+  tbl.node[$].children.push(th.node);
+  for (let i = 0; i < vals.length; i++) {
+    const trn = cloneNode(tr.node, tbl.node);
+    const data = vals[i];
+    renderCols(trn, false, data);
+    tbl.node[$].children.push(trn);
   }
 }

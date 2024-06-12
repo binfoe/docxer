@@ -2,18 +2,26 @@ import type { Table } from 'src/parse/table';
 import type JSZip from 'jszip';
 import type { Paragraph } from '../parse/common';
 import { RenderContext } from './context';
-import { renderTableCommand } from './command/table';
+import { renderDymTableCommand, renderTableCommand } from './command/table';
 import { renderParagraph } from './paragraph';
 
 export function renderTable(tbl: Table, context: RenderContext) {
   if (tbl.loopDirective) {
     const cmd = tbl.loopDirective.commands[0];
-    if (cmd.name !== '#table') throw new Error('unexpect');
-    renderTableCommand({
-      argstr: cmd.argstr,
-      context,
-      tbl: tbl,
-    });
+    if (cmd.name !== '#table' && cmd.name !== '#dymtable') throw new Error('unexpect');
+    if (cmd.name === '#table') {
+      renderTableCommand({
+        argstr: cmd.argstr,
+        context,
+        tbl: tbl,
+      });
+    } else if (cmd.name === '#dymtable') {
+      renderDymTableCommand({
+        argstr: cmd.argstr,
+        context,
+        tbl: tbl,
+      });
+    }
   } else {
     tbl.rows.forEach((tr) => {
       tr.paragraphs.forEach((par) => {

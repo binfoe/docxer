@@ -7,14 +7,47 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function test() {
   void processDocx({
-    docxFileBuf: readFileSync(path.resolve(__dirname, '../sample/bb.docx')),
+    docxFileBuf: readFileSync(path.resolve(__dirname, '../sample/a.docx')),
     renderData: {
-      基础信息: {
-        估价报告编号: '久源房估（2024）字第888号',
-      },
-      产权人信息: {
-        姓名: '小葛',
-      },
+      items: [
+        {
+          a: '11',
+          b: 'b1',
+        },
+        {
+          a: '22',
+          b: 'b2',
+        },
+      ],
+      columns: [
+        {
+          name: '姓名',
+          key: 'name',
+          width: 90,
+        },
+        {
+          name: '年龄',
+          key: 'age',
+          width: 40,
+        },
+        {
+          name: '美貌',
+          key: 'score',
+          width: 40,
+        },
+      ],
+      rows: [
+        {
+          name: '小张',
+          age: 20,
+          score: 100,
+        },
+        {
+          name: '小静',
+          age: 18,
+          score: 100,
+        },
+      ],
     },
   }).then((res) => {
     writeFileSync(path.resolve(__dirname, '../sample/out.docx'), res as Buffer);
