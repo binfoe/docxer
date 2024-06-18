@@ -1,5 +1,5 @@
 import type { TRow, Table } from 'src/parse/table';
-import { $, cloneNode, findByTagPath, rmNode } from 'src/node';
+import { $, cloneNode, createNode, createTextNode, findByTagPath, rmNode } from 'src/node';
 import { isNum, isObj, isStr } from 'src/util';
 import type { RenderContext } from '../context';
 import { renderParagraph } from '../paragraph';
@@ -91,7 +91,12 @@ export function renderTableCommand({
     context.pop();
   }
 }
-
+function gid() {
+  return Math.floor(Math.random() * 0x80000000)
+    .toString(16)
+    .toUpperCase()
+    .padStart(8, '0');
+}
 export function renderDymTableCommand({
   argstr,
   context,
@@ -146,7 +151,10 @@ export function renderDymTableCommand({
       let tc = colArr[i];
       if (!tc) {
         tc = cloneNode(colArr[0], row);
+        tc[':@']['w14:paraId'] = gid();
+        tc[':@']['w14:textId'] = gid();
       }
+
       if (column.width > 0) {
         const wtc = findByTagPath(tc, ['w:tcPr', 'w:tcW']);
         if (wtc) {
@@ -154,10 +162,34 @@ export function renderDymTableCommand({
           wtc[':@']['w:w'] = `${column.width * 20}`;
         }
       }
-      if (isHead) {
-        walkReplace(tc, column.name);
+      const rtxt = isHead ? column.name : cellVal?.[column.key];
+      const wp = findByTagPath(tc, ['w:p']);
+      if (!wp) {
+        createNode('w:p', {
+          attrs: {
+            ['w14:paraId']: gid(),
+            ['w14:textId']: gid(),
+          },
+          children: [
+            createNode('w:r', {
+              children: [createTextNode(rtxt)],
+              attrs: {},
+            }),
+          ],
+        });
       } else {
-        walkReplace(tc, cellVal?.[column.key]);
+        wp[':@']['w14:paraId'] = gid();
+        wp[':@']['w14:textId'] = gid();
+        if (!walkReplace(wp, rtxt)) {
+          createNode('w:r', {
+            parent: wp,
+            children: [
+              createNode('w:t', {
+                children: [createTextNode(rtxt)],
+              }),
+            ],
+          });
+        }
       }
       row[$].children.push(tc);
     }

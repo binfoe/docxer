@@ -7,18 +7,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function test() {
   void processDocx({
-    docxFileBuf: readFileSync(path.resolve(__dirname, '../sample/a.docx')),
+    docxFileBuf: readFileSync(path.resolve(__dirname, '../sample/b.docx')),
     renderData: {
-      items: [
-        {
-          a: '11',
-          b: 'b1',
-        },
-        {
-          a: '22',
-          b: 'b2',
-        },
-      ],
       columns: [
         {
           name: '姓名',
@@ -48,6 +38,7 @@ function test() {
           score: 100,
         },
       ],
+      table: {},
     },
   }).then((res) => {
     writeFileSync(path.resolve(__dirname, '../sample/out.docx'), res as Buffer);

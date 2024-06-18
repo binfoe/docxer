@@ -12,23 +12,28 @@ export function walkReplace(node: DocxNode, val?: string) {
   function walknode(n: DocxNode) {
     const { tag, children } = n[$];
     if (tag === 'w:drawing' || tag === 'w:pict') {
-      return;
+      return false;
     } else if (tag === 'w:t') {
       const tn = children[0];
-      if (!tn) return;
+      if (!tn) return false;
       if (first) {
         first = false;
         tn['#text'] = (val ?? globalConfig.emptyVarText).toString();
       } else {
         tn['#text'] = '';
       }
+      return true;
     } else {
+      let ret = false;
       for (const child of children) {
-        walknode(child);
+        if (walknode(child)) {
+          ret = true;
+        }
       }
+      return ret;
     }
   }
-  walknode(node);
+  return walknode(node);
 }
 
 export function walkPathReplace(

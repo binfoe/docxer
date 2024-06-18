@@ -6,6 +6,44 @@ export type DocxNode = {
   '#text'?: string;
 };
 
+export function createNode(
+  tag: string,
+  opts?: {
+    children?: DocxNode[];
+    parent?: DocxNode;
+    attrs?: DocxNode[':@'];
+  },
+) {
+  const children = opts?.children ?? [];
+  const parent = opts?.parent;
+  const node = {
+    [$]: {
+      tag,
+      parent: opts?.parent,
+      children,
+    },
+    ':@': opts?.attrs ?? {},
+    [tag]: children,
+  } as DocxNode;
+  children.forEach((c) => (c[$].parent = node));
+  if (parent) parent[$].children.push(node);
+  return node;
+}
+
+export function createTextNode(text: string, parent?: DocxNode) {
+  const node = {
+    [$]: {
+      tag: '#text',
+      parent,
+      children: [],
+    },
+    ':@': {},
+    '#text': text,
+  } as DocxNode;
+  if (parent) parent[$].children.push(node);
+  return node;
+}
+
 export function findParentNode(node: DocxNode, parentTag: string): DocxNode | null {
   if (node[$].tag === parentTag) return node;
   let p = node[$].parent;
