@@ -17,8 +17,8 @@ export function renderParagraph(par: Paragraph, context: RenderContext) {
             }
           : {
               pscope: false,
-              fromPath: dire.fromXPath,
-              toPath: dire.toXPath,
+              fromPath: dire.fromXPath!,
+              toPath: dire.toXPath!,
             }),
       });
       if (!continueNext) {

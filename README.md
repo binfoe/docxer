@@ -31,6 +31,14 @@ processDocx({
 });
 ```
 
+[ClearScript](https://github.com/microsoft/ClearScript) 使用：
+
+```js
+import { processDocx } from 'docxer/all';
+```
+
+`docxer/all` 导出的产物是把依赖的比如 jszip 等库都一起打包到了产物文件中，以一个完整的独立文件的方式提供给业务使用。
+
 ## API
 
 ```ts

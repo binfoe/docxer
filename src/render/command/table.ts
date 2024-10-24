@@ -111,7 +111,11 @@ export function renderDymTableCommand({
   if (!columnsExpr) {
     throw new Error('#dymtable 指令需要指定 columns 表达式');
   }
-  type Col = { width: number; name: string; key: string };
+  interface Col {
+    width: number;
+    name: string;
+    key: string;
+  }
   const columns = context.eval(columnsExpr) as Col[];
   if (!Array.isArray(columns)) {
     throw new Error('#dymtable 指令的 columns 表达式必须返回数组');
@@ -138,8 +142,8 @@ export function renderDymTableCommand({
     throw new Error('#dymtable 指令的标记的表格至少要有两行，第一行是表头，第二行是表身');
   }
 
-  for (let i = 0; i < tbl.rows.length; i++) {
-    rmNode(tbl.rows[i].node);
+  for (const row of tbl.rows) {
+    rmNode(row.node);
   }
 
   const renderCols = (row: TRow['node'], isHead: boolean, cellVal?: Record<string, string>) => {
@@ -172,7 +176,7 @@ export function renderDymTableCommand({
           },
           children: [
             createNode('w:r', {
-              children: [createTextNode(rtxt)],
+              children: [createTextNode(rtxt!)],
               attrs: {},
             }),
           ],
@@ -185,7 +189,7 @@ export function renderDymTableCommand({
             parent: wp,
             children: [
               createNode('w:t', {
-                children: [createTextNode(rtxt)],
+                children: [createTextNode(rtxt!)],
               }),
             ],
           });
@@ -196,9 +200,8 @@ export function renderDymTableCommand({
   };
   renderCols(th.node, true);
   tbl.node[$].children.push(th.node);
-  for (let i = 0; i < vals.length; i++) {
+  for (const data of vals) {
     const trn = cloneNode(tr.node, tbl.node);
-    const data = vals[i];
     renderCols(trn, false, data);
     tbl.node[$].children.push(trn);
   }

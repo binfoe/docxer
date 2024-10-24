@@ -36,7 +36,7 @@ export function parseXmlBody(xmlBody: DocxNode, globalStores: DocxStores) {
   }
   if (cfgIdx >= 0) {
     const parr = xmlBodyNodes.splice(cfgIdx, xmlBodyNodes.length - cfgIdx);
-    parseConfig(globalStores, parr as Record<string, unknown>[]);
+    parseConfig(globalStores, parr as unknown as Record<string, unknown>[]);
   }
   return {
     tables: tables.filter((tbl) => !!tbl.rows.length),

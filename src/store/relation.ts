@@ -17,8 +17,8 @@ function getType(tp: string) {
 }
 export async function parseRels(xmlRels: { Relationships: XmlRel[] }) {
   const relsStore: RelsStore = new Map();
-  xmlRels['Relationships'].forEach((xml) => {
-    if (!(xml as { Relationship?: unknown })['Relationship'] || !xml[':@']) return;
+  xmlRels.Relationships.forEach((xml) => {
+    if (!(xml as { Relationship?: unknown }).Relationship || !xml[':@']) return;
     const attrs = xml[':@'];
     const rel = {
       id: attrs.Id,

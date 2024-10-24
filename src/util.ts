@@ -29,7 +29,7 @@ export function writeXML(zip: JSZip, filename: string, xml: any) {
 export function extractXmlNodesText(nodes: Record<string, unknown>[]) {
   const txt: string[] = [];
   function walk(n: Record<string, unknown>) {
-    const tag = getXmlTag(n);
+    const tag = getXmlTag(n)!;
     if (tag === 'w:cr') {
       txt.push('\n');
     } else if (tag === '#text') {
@@ -52,7 +52,7 @@ export function extractXmlPTextLines(node: Record<string, unknown>) {
   const result: string[] = [];
   const line: string[] = [];
   function walk(n: Record<string, unknown>) {
-    const tag = getXmlTag(n);
+    const tag = getXmlTag(n)!;
     if (tag === 'w:cr') {
       line.length && result.push(line.join('').trim());
       line.length = 0;

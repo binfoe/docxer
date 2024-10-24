@@ -4,7 +4,7 @@ import type { RenderCmdOpts } from './common';
 import { walkReplace } from './var';
 
 export function renderIepCommand({ argstr, paragraph, context }: RenderCmdOpts) {
-  const count = context.eval(argstr);
+  const count = argstr ? context.eval(argstr) : undefined;
   if (!isNum(count) || count < 1) {
     throw new Error('#iep 指令的表达式必须返回正整数');
   }
@@ -15,6 +15,9 @@ export function renderIepCommand({ argstr, paragraph, context }: RenderCmdOpts) 
   }
 
   const body = paragraph.node[$].parent;
+  if (!body) {
+    throw new Error('未知异常，paragraph 没有 parent');
+  }
   const parr = body[$].children;
   const pi = parr.indexOf(paragraph.node);
   parr.splice(pi, 1);

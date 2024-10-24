@@ -35,15 +35,15 @@ function calcXPath(pnode: DocxNode, d: RangeDirective) {
   let col = 1;
   const fromCol = d.fromCol;
   const toCol = d.toCol;
-  let fpath: number[] = null;
-  let tpath: number[] = null;
+  let fpath: number[] | undefined = undefined;
+  let tpath: number[] | undefined = undefined;
   function walk(n: DocxNode) {
     if (n[$].tag === 'w:t') {
       if (!n[$].children.length) {
         return;
       }
       const tnode = n[$].children[0];
-      const txt = tnode['#text'];
+      const txt = tnode['#text'] ?? '';
       const tlen = txt.length;
       const newcol = col + tlen;
       let tpathsi = 0;
@@ -53,16 +53,18 @@ function calcXPath(pnode: DocxNode, d: RangeDirective) {
         } else if (newcol > fromCol) {
           const wr = n[$].parent;
           if (wr?.[$].tag !== 'w:r') throw new Error('未知文档格式');
-          const wr2 = cloneNode(wr, wr[$].parent);
+          const wr2 = cloneNode(wr, wr[$].parent!);
           tpathsi = fromCol - col;
           const tl = txt.slice(0, tpathsi);
-          const tnode2 = wr2[$].children.find((c) => c[$].tag === 'w:t')[$].children[0];
+          const tnode2 = wr2[$].children.find((c) => c[$].tag === 'w:t')?.[$].children[0];
+          if (!tnode2) throw new Error('未知文档格式');
           tnode2['#text'] = tl;
 
           const tr = txt.slice(tpathsi);
           tnode['#text'] = tr;
 
-          const parr = wr[$].parent[$].children;
+          const parr = wr[$].parent?.[$].children;
+          if (!parr) throw new Error('未知文档格式');
           const i = parr.indexOf(wr);
           parr.splice(i, 0, wr2);
           xpath[xpath.length - 2]++; // 倒数第二个 w:r 元素的左侧插入元素后，该元素的 xpath 的索引 +1
@@ -76,14 +78,16 @@ function calcXPath(pnode: DocxNode, d: RangeDirective) {
         } else if (newcol > toCol) {
           const wr = n[$].parent;
           if (wr?.[$].tag !== 'w:r') throw new Error('未知文档格式');
-          const wr2 = cloneNode(wr, wr[$].parent);
+          const wr2 = cloneNode(wr, wr[$].parent!);
           const tl = txt.slice(tpathsi, toCol - 1);
           tnode['#text'] = tl;
           const tr = txt.slice(toCol - 1);
-          const tnode2 = wr2[$].children.find((c) => c[$].tag === 'w:t')[$].children[0];
+          const tnode2 = wr2[$].children.find((c) => c[$].tag === 'w:t')?.[$].children[0];
+          if (!tnode2) throw new Error('未知文档格式');
           tnode2['#text'] = tr;
 
-          const parr = wr[$].parent[$].children;
+          const parr = wr[$].parent?.[$].children;
+          if (!parr) throw new Error('未知文档格式');
           const i = parr.indexOf(wr);
           parr.splice(i + 1, 0, wr2);
           tpath = xpath.slice(); // xpath.slice 必须先调用
@@ -101,7 +105,7 @@ function calcXPath(pnode: DocxNode, d: RangeDirective) {
         }
         xpath.push(i);
         walk(children[i]);
-        i = xpath.pop();
+        i = xpath.pop()!;
         if (fpath && tpath) break;
       }
     }

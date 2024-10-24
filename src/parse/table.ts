@@ -17,7 +17,7 @@ export interface Table {
 }
 export function parseTable(globalStores: DocxStores, node: DocxNode): Table {
   const trows: TRow[] = [];
-  let loopDirective: TableDirective = null;
+  let loopDirective: TableDirective | null = null;
   function walk(n: DocxNode, parent: DocxNode) {
     const { tag, children } = n[$];
     if (tag === 'w:p') {

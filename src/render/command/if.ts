@@ -5,7 +5,7 @@ import type { RenderCmdOpts } from './common';
 import { walkPathReplace } from './var';
 
 export function renderIfCommand({ argstr, paragraph, context, ...scope }: RenderCmdOpts) {
-  const val = !!context.eval(argstr);
+  const val = argstr ? !!context.eval(argstr) : false;
   if (val) {
     return true;
   }

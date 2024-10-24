@@ -1,6 +1,6 @@
-import { readFileSync, writeFileSync } from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { processDocx } from './process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

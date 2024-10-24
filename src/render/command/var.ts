@@ -91,7 +91,7 @@ export function walkPathReplace(
   walkpath(root);
 }
 export function renderVarCommand({ argstr, paragraph, context, ...scope }: RenderCmdOpts) {
-  const val = context.eval(argstr);
+  const val = argstr ? context.eval(argstr) : undefined;
 
   if (scope.pscope === true) {
     walkReplace(paragraph.node, val);
@@ -120,7 +120,7 @@ export function renderPictureVarCommand(argstr: string, context: RenderContext, 
     }
   }
   let f = pic.imgRel.target;
-  if (!f.startsWith('word/')) f = 'word/' + f;
+  if (!f.startsWith('word/')) f = `word/${f}`;
   context.zip.file(f, val, {
     binary: true,
   });

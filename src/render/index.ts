@@ -11,13 +11,13 @@ export function renderTable(tbl: Table, context: RenderContext) {
     if (cmd.name !== '#table' && cmd.name !== '#dymtable') throw new Error('unexpect');
     if (cmd.name === '#table') {
       renderTableCommand({
-        argstr: cmd.argstr,
+        argstr: cmd.argstr!,
         context,
         tbl: tbl,
       });
     } else if (cmd.name === '#dymtable') {
       renderDymTableCommand({
-        argstr: cmd.argstr,
+        argstr: cmd.argstr!,
         context,
         tbl: tbl,
       });

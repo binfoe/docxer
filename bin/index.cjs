@@ -1,6 +1,5 @@
-const { processDocx, logger } = require('../dist/index.cjs');
+const { processDocx } = require('../dist/index.cjs');
 
-logger.debug = require('debug')('docxer');
 const fs = require('fs');
 const path = require('path');
 
@@ -15,7 +14,9 @@ if (process.argv.length < 4) {
 使用示例：docxer /var/some_path/template.docx /var/some_path/render_data.json /var/some_path/output.docx`);
 }
 
-let [inputDocxFile, inputDataFile, outputDocxFile] = process.argv.slice(2).map((v) => path.resolve(process.cwd(), v));
+let [inputDocxFile, inputDataFile, outputDocxFile] = process.argv
+  .slice(2)
+  .map((v) => path.resolve(process.cwd(), v));
 if (!inputDocxFile.endsWith('.docx')) {
   panic('输入文件只支持 .docx 后缀名');
 }

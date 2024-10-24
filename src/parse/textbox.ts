@@ -29,16 +29,16 @@ function parseLocation(txt: string, pnodes: DocxNode[]) {
     from: undefined,
     to: undefined,
   };
-  let ptext: string = '';
+  let ptext = '';
   if (f) {
     if (f.length === 1) throw new Error('#@ 开始位置标记参数错误');
     const c = f.charCodeAt(0);
     if (c === 99) {
       loc.from = Number(f.slice(1));
     } else if (c === 119) {
-      ptext = extractXmlPTextLines(pnodes[pi - 1]).join('\n');
+      ptext = extractXmlPTextLines(pnodes[pi - 1] as unknown as Record<string, unknown>).join('\n');
       const idx = ptext.indexOf(f.slice(1));
-      if (idx < 0) throw new Error('#@ 开始位置关键字未找到：' + f);
+      if (idx < 0) throw new Error(`#@ 开始位置关键字未找到：${f}`);
       loc.from = idx + 1;
       loc.to = loc.from + f.length - 1;
     } else {
@@ -47,14 +47,15 @@ function parseLocation(txt: string, pnodes: DocxNode[]) {
   }
   if (t) {
     if (t.length === 1) throw new Error('#@ 开始位置标记参数错误');
-    if (!ptext) ptext = extractXmlPTextLines(pnodes[pi - 1]).join('\n');
+    if (!ptext)
+      ptext = extractXmlPTextLines(pnodes[pi - 1] as unknown as Record<string, unknown>).join('\n');
 
     const c = t.charCodeAt(0);
     if (c === 99) {
       loc.from = Number(t.slice(1));
     } else if (c === 119) {
       const idx = ptext.indexOf(f.slice(1));
-      if (idx < 0) throw new Error('#@ 结束位置关键字未找到：' + f);
+      if (idx < 0) throw new Error(`#@ 结束位置关键字未找到：${f}`);
       loc.to = idx + t.length - 1;
     } else {
       throw new Error('#@ 位置只支持 i 和 w');
@@ -117,18 +118,18 @@ export function parseTextbox(
   globalStores: DocxStores,
   node: DocxNode,
   texts: string[],
-): Paragraph[] {
+): Paragraph[] | undefined {
   const txc = findByTagPath(node, ['wps:txbx', 'w:txbxContent']);
   if (!txc) {
     logger.error('没有找到 w:txbxContent');
-    return null;
+    return undefined;
   }
   const pnodes = txc[$].children.filter((n) => wrapInner(n)[$].tag === 'w:p');
   if (!pnodes.length) {
     logger.error('指令作用在了空文本框');
-    return null;
+    return undefined;
   }
-  let loc: Loc = null;
+  let loc: Loc | null = null;
   const parr: Paragraph[] = pnodes.map((pn) => {
     return {
       node: pn,
@@ -174,6 +175,7 @@ export function parseTextbox(
   });
 
   if (loc && commands.length) {
+    loc = loc as Loc;
     const p = parr[loc.pidx - 1];
     if (loc.from !== undefined && loc.to !== undefined) {
       p.directives.push({

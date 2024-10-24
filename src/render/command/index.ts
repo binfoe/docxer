@@ -18,6 +18,6 @@ export function renderCommand(options: RenderCmdOpts): boolean {
     case '#igp':
       return renderIgCommand(options);
     default:
-      throw new Error('不支持的指令：' + options.name);
+      throw new Error(`不支持的指令：${options.name}`);
   }
 }

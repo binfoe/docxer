@@ -17,7 +17,7 @@ interface WalkPCtx {
 function walkP(paragraph: Paragraph, ctx: WalkPCtx, currentNode: DocxNode, parentNode: DocxNode) {
   if (ctx.meetConfig) return;
 
-  const tag = getXmlTag(currentNode);
+  const tag = getXmlTag(currentNode as unknown as Record<string, unknown>)!;
   const children = (currentNode as unknown as Record<string, DocxNode[]>)[tag] ?? [];
 
   currentNode[$] = {
@@ -28,6 +28,7 @@ function walkP(paragraph: Paragraph, ctx: WalkPCtx, currentNode: DocxNode, paren
 
   if (tag === '#text') {
     const t = currentNode[tag];
+    if (!t) return;
     if (t === '#docxer-config') {
       ctx.meetConfig = true;
       return;
@@ -42,7 +43,7 @@ function walkP(paragraph: Paragraph, ctx: WalkPCtx, currentNode: DocxNode, paren
     const commands: Command[] = [];
     let isp = false;
     let istbl = false;
-    cmt.texts.forEach((txt, ti) => {
+    cmt?.texts.forEach((txt, ti) => {
       const i = txt.indexOf(' ');
       const cmd = i > 0 ? txt.slice(0, i) : txt;
       const argstr = i > 0 ? txt.slice(i + 1) : '';
@@ -94,7 +95,7 @@ function walkP(paragraph: Paragraph, ctx: WalkPCtx, currentNode: DocxNode, paren
   } else if (tag === 'w:drawing') {
     const darr = parseXmlDrawing(ctx.globalStores, currentNode);
     if (darr?.length) {
-      paragraph.drawings.push(...darr);
+      paragraph.drawings?.push(...darr);
     }
   } else if (tag === 'w:tbl') {
     throw new Error('段落里不应该出现 w:tbl');
@@ -119,9 +120,9 @@ export function parseTableParagraph(globalStores: DocxStores, pnode: DocxNode, p
     globalStores,
     diStack: [],
     cmtNodes: [],
-    tableDirective: null,
+    tableDirective: undefined,
   };
-  walkP(paragraph, ctx, pnode, parent);
+  walkP(paragraph, ctx, pnode, parent!);
 
   ctx.cmtNodes.forEach((cmt) => {
     rmNode(cmt);
@@ -148,9 +149,9 @@ export function parseParagraph(
     globalStores,
     diStack: [],
     cmtNodes: [],
-    tableDirective: null,
+    tableDirective: undefined,
   };
-  walkP(paragraph, ctx, pnode, parent);
+  walkP(paragraph, ctx, pnode, parent!);
   if (ctx.tableDirective) {
     throw new Error('#table 或 #dymtable 指令只能在表格中标记');
   }

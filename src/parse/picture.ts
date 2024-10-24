@@ -6,7 +6,7 @@ import { findByTagPath } from '../node';
 const PictureCmdSet = new Set(['#var', '#if', '#for']);
 
 export function parsePicture(globalStores: DocxStores, node: DocxNode, texts: string[]) {
-  node = findByTagPath(node, ['pic:blipFill', 'a:blip']);
+  node = findByTagPath(node, ['pic:blipFill', 'a:blip'])!;
   if (!node) {
     logger.error('parsePicture: a:blip not found');
     return null;
@@ -21,7 +21,7 @@ export function parsePicture(globalStores: DocxStores, node: DocxNode, texts: st
     const name = i > 0 ? txt.slice(0, i) : txt;
     const argstr = i > 0 ? txt.slice(i + 1) : '';
     if (!PictureCmdSet.has(name)) {
-      throw new Error('图片描述中有不支持的指令: ' + name);
+      throw new Error(`图片描述中有不支持的指令: ${name}`);
     }
     return { name, argstr };
   });

@@ -23,13 +23,13 @@ export function parseConfig(globalStores: DocxStores, pnodes: Record<string, unk
     if (t === '#prepare') {
       i++;
       const pn2 = pnodes[i];
-      const tag2 = getXmlTag(pn2);
+      const tag2 = getXmlTag(pn2)!;
       const code = extractXmlNodesText(pn2[tag2] as Record<string, unknown>[]).trim();
       if (code) {
         globalStores.cfg.prepare = code;
       }
     } else if (t.startsWith('#')) {
-      throw new Error('未知配置指令：' + t);
+      throw new Error(`未知配置指令：${t}`);
     }
   }
 }

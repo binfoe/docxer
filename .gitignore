@@ -4,10 +4,10 @@ node_modules
 /sample
 /.vscode/launch.json
 **/.DS_Store
-.jshintignore
-.jshintrc
-.jshint
-.jshint.json
+
 dist/
 lib/
 types/
+
+.vscode/*
+!.vscode/settings.json

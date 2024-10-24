@@ -1,4 +1,3 @@
-import JSZip from 'jszip';
 import { isObj, readXML, writeXML } from './util';
 import { parseComments } from './store/comment';
 import { parseXmlBody } from './parse';
@@ -12,6 +11,8 @@ import type { DocxNode } from './node';
 import { $ } from './node';
 import type { RenderConfig } from './config';
 import { globalConfig } from './config';
+
+import JSZip from 'jszip';
 
 // 校验和预处理 directives，当前仅处理两层。文本框内如果再嵌入文本框不支持。
 function prepareParagraph(par: Paragraph) {
@@ -30,9 +31,9 @@ export async function processDocx({
   renderData,
   renderConfig,
 }: {
-  docxFileBuf: ArrayBuffer | Buffer;
+  docxFileBuf: ArrayBuffer | Buffer | Uint8Array;
   /** 渲染数据。必须是 object 对象，且不能有 'ctx' 这个保留单词的属性名。 */
-  renderData: { [key: string]: unknown };
+  renderData: Record<string, unknown>;
   renderConfig?: Partial<RenderConfig>;
 }) {
   if (!isObj(renderData)) {

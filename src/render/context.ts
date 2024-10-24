@@ -34,9 +34,9 @@ export class RenderContext {
       if (ex.name === 'ReferenceError') {
         const vn = ex.message.slice(0, ex.message.length - 15);
         if (expr.startsWith(vn)) {
-          throw new Error('ERROR_MISSING_FORM:' + expr);
+          throw new Error(`ERROR_MISSING_FORM:${expr}`);
         } else {
-          throw new Error('ERROR_MISSING_FORM_FIELD:' + expr);
+          throw new Error(`ERROR_MISSING_FORM_FIELD:${expr}`);
         }
       } else {
         throw ex;

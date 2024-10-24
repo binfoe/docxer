@@ -16,12 +16,12 @@ interface XMLComment {
 export function extractCommentTexts(node: XMLComment) {
   const texts: string[] = [];
   node['w:comment'].forEach((pnode) => {
-    texts.push(...extractXmlPTextLines(pnode));
+    texts.push(...extractXmlPTextLines(pnode as unknown as Record<string, unknown>));
   });
   return texts;
 }
 export function parseComments(commentsXml: { 'w:comments': XMLComment[] }) {
-  const commentStore: Map<string, DocxComment> = new Map();
+  const commentStore = new Map<string, DocxComment>();
   commentsXml['w:comments'].forEach((xml: XMLComment) => {
     const cmt = {
       id: xml[':@']['w:id'],
