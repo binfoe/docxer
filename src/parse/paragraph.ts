@@ -18,6 +18,7 @@ function walkP(paragraph: Paragraph, ctx: WalkPCtx, currentNode: DocxNode, paren
   if (ctx.meetConfig) return;
 
   const tag = getXmlTag(currentNode as unknown as Record<string, unknown>)!;
+
   const children = (currentNode as unknown as Record<string, DocxNode[]>)[tag] ?? [];
 
   currentNode[$] = {
@@ -34,8 +35,6 @@ function walkP(paragraph: Paragraph, ctx: WalkPCtx, currentNode: DocxNode, paren
       return;
     }
     ctx.tidx += t.length;
-  } else if (tag === 'w:pict') {
-    // ignore
   } else if (tag === 'w:commentRangeStart') {
     ctx.cmtNodes.push(currentNode);
     const id = currentNode[':@']['w:id'];
@@ -97,6 +96,12 @@ function walkP(paragraph: Paragraph, ctx: WalkPCtx, currentNode: DocxNode, paren
     if (darr?.length) {
       paragraph.drawings?.push(...darr);
     }
+  } else if (tag === 'w:pict') {
+    // w:pict 是老版本的 office word 文本框的格式。当前直接忽略。
+    // const darr = parseXmlDrawing(ctx.globalStores, currentNode);
+    // if (darr?.length) {
+    //   paragraph.drawings?.push(...darr);
+    // }
   } else if (tag === 'w:tbl') {
     throw new Error('段落里不应该出现 w:tbl');
   } else if (children?.length) {

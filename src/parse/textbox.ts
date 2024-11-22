@@ -23,7 +23,8 @@ function parseLocation(txt: string, pnodes: DocxNode[]) {
     .map((s) => s.trim());
   if (!p || p.charCodeAt(0) !== 112) throw new Error('#@ 必须指定段落，比如 #@ p1');
   const pi = Number(p.slice(1));
-  if (!(pi >= 1) || pi > pnodes.length) throw new Error('#@ 指定的段落区间错误');
+  if (!(pi >= 1) || pi > pnodes.length)
+    throw new Error(`#@ 指定的段落区间错误，需要 1 到 ${pnodes.length}，实际传入：${pi}`);
   const loc: Loc = {
     pidx: pi,
     from: undefined,
@@ -117,7 +118,7 @@ export function wrapP(currentNode: DocxNode, parentNode: DocxNode) {
 export function parseTextbox(
   globalStores: DocxStores,
   node: DocxNode,
-  texts: string[],
+  directiveTexts: string[],
 ): Paragraph[] | undefined {
   const txc = findByTagPath(node, ['wps:txbx', 'w:txbxContent']);
   if (!txc) {
@@ -137,7 +138,7 @@ export function parseTextbox(
     };
   });
   let commands: Command[] = [];
-  texts.forEach((txt) => {
+  directiveTexts.forEach((txt) => {
     const i = txt.indexOf(' ');
     const name = i > 0 ? txt.slice(0, i) : txt;
     txt = i > 0 ? txt.slice(i + 1) : '';

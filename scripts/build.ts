@@ -11,26 +11,29 @@ function getOption(type: 'cjs' | 'esm', all = false): Options {
     noExternal: all ? ['fast-xml-parser', 'jszip'] : undefined,
     bundle: true,
     format: type,
+
     target: all ? 'es2020' : 'esnext',
     platform: type === 'esm' ? 'browser' : 'node',
   };
 }
 
 (async () => {
-  await build(getOption('esm', true));
-  await build(getOption('cjs', true));
+  if (process.env.WATCH) {
+    await build({
+      ...getOption('cjs'),
+      watch: true,
+    });
+  } else {
+    await build(getOption('esm', true));
+    await build(getOption('cjs', true));
 
-  // tsup 没有提供指定产出文件的名称的参数？？
-  await rename('./dist/index.cjs', './dist/index.all.cjs');
-  await rename('./dist/index.js', './dist/index.all.js');
+    // tsup 没有提供指定产出文件的名称的参数？？
+    await rename('./dist/index.cjs', './dist/index.all.cjs');
+    await rename('./dist/index.js', './dist/index.all.js');
 
-  await build(getOption('esm'));
-  await build(getOption('cjs'));
-  // if (process.env.WATCH) {
-  //   const ctx = await esbuild.context(getOption());
-  //   await ctx.watch();
-  //   console.log('Watching For dist/index.mjs bundle...');
-  // }
+    await build(getOption('esm'));
+    await build(getOption('cjs'));
+  }
 })().catch((ex) => {
   console.error(ex);
 });

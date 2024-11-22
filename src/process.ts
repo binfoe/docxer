@@ -2,7 +2,7 @@ import { isObj, readXML, writeXML } from './util';
 import { parseComments } from './store/comment';
 import { parseXmlBody } from './parse';
 import { parseRels } from './store/relation';
-import type { DocxStores } from './store';
+import type { DocxStores, RelsStore } from './store';
 import { prepareDirectives } from './directive';
 import { renderDocument } from './render';
 import type { Paragraph } from './parse/common';
@@ -45,6 +45,62 @@ export async function processDocx({
   Object.assign(globalConfig.helperFunctions, helperFunctions);
 
   const zip = await JSZip.loadAsync(docxFileBuf);
+  const { relsStore: mainDocRels } = await processMainDoc(zip, renderData);
+
+  for await (const item of [...mainDocRels.values()]) {
+    if (item.type !== 'footer' || !item.target) continue;
+    await processFooterDoc(zip, renderData, item.target);
+  }
+
+  const buf = await zip.generateAsync({
+    type: typeof Buffer === 'undefined' ? 'blob' : 'nodebuffer',
+  });
+  return buf;
+}
+
+/**
+ * 处理页脚。office word 的页脚不支持批注，可以采用插入文本框的方式模拟。
+ */
+async function processFooterDoc(
+  zip: JSZip,
+  renderData: Record<string, unknown>,
+  footerFilename: string,
+) {
+  const footerDocFilename = `word/${footerFilename}`;
+  const relsDocFilename = `word/_rels/${footerFilename}.rels`;
+  let relsStore: RelsStore = new Map();
+  try {
+    const relsDoc = await readXML(zip, relsDocFilename);
+    relsStore = await parseRels(relsDoc[1]);
+  } catch (ex) {
+    console.error(ex);
+    //
+  }
+  const footerDoc = await readXML(zip, footerDocFilename);
+  const footerBody = footerDoc[1] as DocxNode;
+  const globalStores: DocxStores = {
+    currentDoc: 'footer',
+    relsStore,
+    // 页脚不会有批注，也不会有 #prepare 配置。保留 DocxStores 的统一格式。
+    cmtStore: new Map(),
+    cfg: {},
+  };
+  const { paragraphs, tables } = parseXmlBody(footerBody, globalStores);
+  paragraphs.forEach((par) => prepareParagraph(par));
+
+  renderDocument({
+    tables,
+    paragraphs,
+    renderData,
+    zip,
+  });
+  writeXML(zip, footerDocFilename, footerDoc);
+}
+
+/**
+ * 处理主体文档。
+ */
+async function processMainDoc(zip: JSZip, renderData: Record<string, unknown>) {
   const mainDocFilename = 'word/document.xml';
   const commentsDocFilename = 'word/comments.xml';
   const relsDocFilename = 'word/_rels/document.xml.rels';
@@ -55,6 +111,7 @@ export async function processDocx({
   const relsStore = await parseRels(relsDoc[1]);
 
   const globalStores: DocxStores = {
+    currentDoc: 'main',
     cmtStore,
     relsStore,
     cfg: {},
@@ -106,8 +163,8 @@ export async function processDocx({
 
   writeXML(zip, mainDocFilename, mainDoc);
   commentsDoc && writeXML(zip, commentsDocFilename, commentsDoc);
-  const buf = await zip.generateAsync({
-    type: typeof Buffer === 'undefined' ? 'blob' : 'nodebuffer',
-  });
-  return buf;
+
+  return {
+    relsStore,
+  };
 }

@@ -5,6 +5,7 @@
     "allowSyntheticDefaultImports": true,
     "target": "ESNext",
     "skipLibCheck": true,
+    "strict": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "stripInternal": true,

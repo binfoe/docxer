@@ -6,6 +6,7 @@ export * from './comment';
 export * from './relation';
 
 export interface DocxStores {
+  currentDoc: 'main' | 'footer';
   cmtStore: CommentStore;
   relsStore: RelsStore;
   cfg: Config;
